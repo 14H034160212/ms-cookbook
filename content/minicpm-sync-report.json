@@ -1,0 +1,255 @@
+{
+  "syncedAt": "2026-10-15",
+  "sourceUrl": "https://my.feishu.cn/wiki/RIGawSH3UiEC2ekVwsPcyy7GnRb",
+  "documentRevision": 261,
+  "sourceXmlSha256": "0e895f40635498af5e408cbcd5f0e3e352aa083fc829618d23f17d1b01d8a17e",
+  "method": "Import the two sections from the current Feishu document; preserve prose, tables, code and heading order.",
+  "adaptations": [
+    "Remove Part labels from chapter titles.",
+    "Add a local download link to the original practice attachment at the start of both chapters.",
+    "Localize the existing attachment link.",
+    "Update the evaluation cross-reference from chapter 15 to chapter 16."
+  ],
+  "attachment": {
+    "file": "assets/minicpm-20261015/minicpm-practice-v0.1.zip",
+    "originalName": "MiniCPM_魔搭紫皮书_章节与实践包_v0.1.zip",
+    "bytes": 112587,
+    "sha256": "359d954866fa417f9f0152c74eb154173ad4e71fecef206f7cf6de602f4e34a9",
+    "modified": false
+  },
+  "chapters": [
+    {
+      "number": 11,
+      "partIndex": 2,
+      "title": "把自己微调的 MiniCPM 装进手机：从训练拆解到魔搭实践",
+      "chapterFileSha256": "5f41233e6f27e9e46528881961796e12428dc9a9be5f353eae2a9eecd1b102c5",
+      "proseVerified": true,
+      "codeBlocks": 14,
+      "codeVerified": true,
+      "headingOrderVerified": true
+    },
+    {
+      "number": 21,
+      "partIndex": 4,
+      "title": "用 MiniCPM-V 搭建手机巡检助手：拍照生成现场记录",
+      "chapterFileSha256": "2c02f5b0b95c54ad885e338e1b5a509021f51316c0e45705f93212c1cba34183",
+      "proseVerified": true,
+      "codeBlocks": 14,
+      "codeVerified": true,
+      "headingOrderVerified": true
+    }
+  ],
+  "previousChapterNumbers": [
+    {
+      "previous": 1,
+      "current": 1,
+      "title": "开源模型正在改变什么",
+      "discussionId": "chapter-1"
+    },
+    {
+      "previous": 2,
+      "current": 2,
+      "title": "开源模型还没用上，先卡在下载这一步？",
+      "discussionId": "chapter-2"
+    },
+    {
+      "previous": 3,
+      "current": 3,
+      "title": "数据，是你要做开源模型微调的基石",
+      "discussionId": "chapter-3"
+    },
+    {
+      "previous": 4,
+      "current": 4,
+      "title": "没有资源也能玩开源模型，因为这里资源免费",
+      "discussionId": "chapter-4"
+    },
+    {
+      "previous": 5,
+      "current": 5,
+      "title": "要把业务问题转换成模型任务问题",
+      "discussionId": "chapter-5"
+    },
+    {
+      "previous": 6,
+      "current": 6,
+      "title": "先评再选：用 EvalScope 形成开源模型的第一份报告",
+      "discussionId": "chapter-6"
+    },
+    {
+      "previous": 7,
+      "current": 7,
+      "title": "30 分钟带你快速看到第一个结果",
+      "discussionId": "chapter-7"
+    },
+    {
+      "previous": 8,
+      "current": 8,
+      "title": "多大模型，选择什么样的服务器配置",
+      "discussionId": "chapter-8"
+    },
+    {
+      "previous": 9,
+      "current": 9,
+      "title": "笔记本也能跑开源模型，先从 Ollama 开始",
+      "discussionId": "chapter-9"
+    },
+    {
+      "previous": 10,
+      "current": 10,
+      "title": "把模型放到云端跑，用 Notebook 试试 CPU 和 GPU",
+      "discussionId": "chapter-10"
+    },
+    {
+      "previous": 11,
+      "current": 12,
+      "title": "模型需要资源太多，量化能帮上什么忙？",
+      "discussionId": "chapter-11"
+    },
+    {
+      "previous": 12,
+      "current": 13,
+      "title": "业务素材这么多，怎么变成能训练的数据？",
+      "discussionId": "chapter-12"
+    },
+    {
+      "previous": 13,
+      "current": 14,
+      "title": "快速用 ms-swift，完成开源模型的轻量微调",
+      "discussionId": "chapter-13"
+    },
+    {
+      "previous": 14,
+      "current": 15,
+      "title": "模型已经会回答了，为什么还要做偏好对齐？",
+      "discussionId": "chapter-14"
+    },
+    {
+      "previous": 15,
+      "current": 16,
+      "title": "微调有没有用，测才知道？",
+      "discussionId": "chapter-15"
+    },
+    {
+      "previous": 16,
+      "current": 17,
+      "title": "AI 健身教练：跟着视频练，让 AI 指出动作不标准的地方",
+      "discussionId": "chapter-16"
+    },
+    {
+      "previous": 17,
+      "current": 18,
+      "title": "智能客服质检：AI 能从一通客服电话中分析出什么？",
+      "discussionId": "chapter-17"
+    },
+    {
+      "previous": 18,
+      "current": 19,
+      "title": "搭建一个能听也能说的语音助手",
+      "discussionId": "chapter-18"
+    },
+    {
+      "previous": 19,
+      "current": 20,
+      "title": "实现一个企业知识问答助手",
+      "discussionId": "chapter-19"
+    },
+    {
+      "previous": 20,
+      "current": 22,
+      "title": "场景有千千万，欢迎你来共建出你的场景",
+      "discussionId": "chapter-32"
+    },
+    {
+      "previous": 21,
+      "current": 23,
+      "title": "10 个 Case，带你看看 AIGC 的开源模型能做到什么地步",
+      "discussionId": "chapter-20"
+    },
+    {
+      "previous": 22,
+      "current": 24,
+      "title": "定制？使用 DiffSynth 训练图像 LoRA",
+      "discussionId": "chapter-21"
+    },
+    {
+      "previous": 23,
+      "current": 25,
+      "title": "一张商品营销图，从生成到修改怎么做？",
+      "discussionId": "chapter-22"
+    },
+    {
+      "previous": 24,
+      "current": 26,
+      "title": "开源模型也能做出像样的 AI 视频吗？",
+      "discussionId": "chapter-23"
+    },
+    {
+      "previous": 25,
+      "current": 27,
+      "title": "补充：AIGC 理论知识",
+      "discussionId": "chapter-24"
+    },
+    {
+      "previous": 26,
+      "current": 28,
+      "title": "Agent 是什么，它能做什么事？",
+      "discussionId": "chapter-33"
+    },
+    {
+      "previous": 27,
+      "current": 29,
+      "title": "MCP：让模型连接外部工具",
+      "discussionId": "chapter-25"
+    },
+    {
+      "previous": 28,
+      "current": 30,
+      "title": "Skill：把任务方法封装成能力",
+      "discussionId": "chapter-26"
+    },
+    {
+      "previous": 29,
+      "current": 31,
+      "title": "快速使用 Claude Code",
+      "discussionId": "chapter-27"
+    },
+    {
+      "previous": 30,
+      "current": 32,
+      "title": "快速使用 PI",
+      "discussionId": "chapter-28"
+    },
+    {
+      "previous": 31,
+      "current": 33,
+      "title": "快速使用 DeepSeek Harness",
+      "discussionId": "chapter-29"
+    },
+    {
+      "previous": 32,
+      "current": 34,
+      "title": "补充：Agent 框架知识",
+      "discussionId": "chapter-30"
+    },
+    {
+      "previous": 33,
+      "current": 35,
+      "title": "产线巡检 Agent：用 Penguin Harness 快速开发与优化",
+      "discussionId": "penguin-harness-line-inspection"
+    },
+    {
+      "previous": 34,
+      "current": 36,
+      "title": "补充：大模型基础知识",
+      "discussionId": "chapter-31"
+    },
+    {
+      "previous": 35,
+      "current": 37,
+      "title": "主流 LLM 评测",
+      "discussionId": "chapter-34"
+    }
+  ],
+  "validationScope": "Document migration, generated content, navigation and attachment integrity. Model training and phone benchmarks are reported by the source author and were not re-executed during import."
+}
