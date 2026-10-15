@@ -1,197 +1,346 @@
 <!-- Generated from ../source-html/chapter-21.html; do not edit independently. -->
 
-# 10 个 Case，带你看看 AIGC 的开源模型能做到什么地步
+# 用 MiniCPM-V 搭建手机巡检助手：拍照生成现场记录
 
-现在最强的生图、生视频模型应该是 GPT Images 2.5 和 Seedance 2.5 了，生图、生视频的上限又被往前推了一截。
+配套实践包：[MiniCPM&#95;魔搭紫皮书&#95;章节与实践包&#95;v0.1.zip](<../../assets/minicpm-20261015/minicpm-practice-v0.1.zip>)
 
-那如果把它们当成闭源模型的第一梯队，那开源模型现在到底是什么水平？是玩具吗？是否能真正带来生产力？
+做物业巡检时，发现问题后会拍下一张照片，并且把事情记清楚。比如，走廊里的灯罩破损了，照片可以留下现场的样子，但具体在哪一层、哪个位置、发现了什么问题，都要人工补录很多文字信息，才能方便后续人员查看和处理。
 
-这篇直接看看大佬们，能把开源模型玩到什么地步，其中生图选择阿里的 Z-Image，生视频选择 MiniMax H3。
+如果这些信息能在现场整理好，就不用再回头一张张对着照片补写；遇到网络不好的地方，也希望先把记录保存在手机上，等有网络时再提交。对于巡检人员来说，拍照、填写和保存直接一次性完成，不用在几个界面之间来回切换。
 
-<p></p>
+围绕这个场景，我们尝试用 MiniCPM-V 搭建一个手机巡检助手。
+
+先在魔搭 Notebook 中验证图片理解效果，再接入 Android 手机，让模型在手机上生成观察草稿。工作人员确认后，记录保存在本地，有网络时再同步到台账，供后续查看和处理。我们希望把拍照之后的记录工作做得更方便，同时保留工作人员检查和修改的机会。
 
 <a id="c21-s1"></a>
 
-## <strong>先介绍一下这两个模型</strong>
+## 1\. 把巡检需求变成明确的模型任务
 
-Z-Image 是做的 6B 生图模型，采用 Apache 2.0 许可证。完整的 Z-Image 是非蒸馏底模，支持 CFG、负面提示词和微调；社区里更常见的是 Z-Image-Turbo，只用 8 步，追求的就是一个快。
+首个版本只处理公共区域中可以拍到的表面现象，例如灯罩破损、地面散落物和墙面可见污迹。它不从照片确定电路是否损坏，也不决定是否需要停机、维修或更换设备。
 
-MiniMax H3 则是 33B 的音视频生成模型，可以输出 4 到 15 秒、24fps、带立体声音频的视频。严格来说，它属于开放权重模型，使用的是 MiniMax H3 Community License。开源出来的 H3-Base 可以在本地生成 768p 音视频，但官方那套负责理解复杂输入的 Context-IR，以及 2K 再生成流程，没有完整开源。
+假设照片中可见破损灯罩，用户输入位置“二层东侧走廊”，模型草稿的目标结构是：
 
-<p></p>
+```json
+{
+  "object": "灯罩",
+  "visible_issue": "灯罩表面可见破损",
+  "needs_retake": false,
+  "missing_fields": []
+}
+```
+
+这是期望输出示例，不是模型实测回答。若图片暗到无法确认，契约允许返回：
+
+```json
+{
+  "object": null,
+  "visible_issue": null,
+  "needs_retake": true,
+  "missing_fields": ["object", "visible_issue"]
+}
+```
+
+`needs_retake` 只是一条模型建议，没有校准概率的含义。即使它为 false，也仍然需要人员查看照片与字段。清晰的正常场景可以描述“未见明显表面异常”，这表示照片范围内的观察，不等于设备整体正常。
 
 <a id="c21-s2"></a>
 
-## <strong>Z-Image，已经不只是把脸画得好看</strong>
+### 字段来自哪里
 
-现在很多生图模型都能生成美女，单看一张精修脸其实没啥意思。真正难的是：文字写对没有？数量数对没有？同一件商品能不能在不同视图里保持一致？复杂的空间关系有没有理解正确？
+<table><thead><tr><th><p>字段</p></th><th><p>产生者</p></th><th><p>约束</p></th></tr></thead><tbody><tr><td><p>对象 object、可见现象 visible_issue</p></td><td><p>模型提出、人员修改确认</p></td><td><p>只写有图像依据的信息；无法确认时留空</p></td></tr><tr><td><p>是否建议重拍、缺失字段</p></td><td><p>模型与应用校验</p></td><td><p>提醒用户补拍或补录；不作为诊断结论</p></td></tr><tr><td><p>拍摄时间 captured_at</p></td><td><p>应用</p></td><td><p>保存带时区的时间；说明是否来自现场相机或相册导入</p></td></tr><tr><td><p>位置 location</p></td><td><p>用户选择或输入</p></td><td><p>第一版不用模型猜测楼层，不把未经授权定位当成默认输入</p></td></tr><tr><td><p>记录 ID</p></td><td><p>应用</p></td><td><p>创建后固定，重试同步仍使用同一 ID</p></td></tr><tr><td><p>图片 SHA256、模型版本</p></td><td><p>应用</p></td><td><p>用于关联原始输入与推理产物</p></td></tr><tr><td><p>确认人、确认时间</p></td><td><p>人员操作与应用</p></td><td><p>只有点击确认后生成正式记录</p></td></tr><tr><td><p>处理状态、服务端版本</p></td><td><p>台账</p></td><td><p>待处理、处理中、已关闭，独立于模型草稿</p></td></tr></tbody></table>
 
-<p></p>
-
-先看 <span>@</span>witcheer 做的一组本地测试。
-
-![正文配图](<../../assets/manuscript-20260914/c20-4e303a2853b092.webp>)
-
-他在 RTX 5090 上跑 Z-Image-Turbo，1024px 图片大约只要 3.2 秒一张。提示词里要求商店招牌写出指定单词，再画出“正好三只鸭子”，结果文字和数量都对了。
-
-这两个任务看着幼稚，其实一直是扩散模型的老大难。字母容易糊，三只鸭子经常咔咔咔变成四五只。
-
-![正文配图](<../../assets/manuscript-20260914/c20-c027c81c79257c.webp>)
-
-![正文配图](<../../assets/manuscript-20260914/c20-372f0213a6907c.webp>)
-
-原帖：https://x.com/witcheer/status/2074020722972758139
-
-<p></p>
-
-接着是一个更接近电商交付的 case。
-
-<span>@</span>rizavelioglu 让模型生成一张左右分栏图：左边只放一件白色花纹 T 恤，右边让真人模特穿上同一件衣服。提示词还要求保留印花、文字、面料、缝线和版型。
-
-最后出来的图里，两边的衣服没有各画各的，花纹和款式基本能对上。对于电商团队来说，这比单纯生成一张“漂亮模特图”值钱多了。商品图、上身图、营销图可以从同一个设计继续往下做。
-
-当然，这只是一张成功样本，离稳定批量出图还有距离。但它至少把方向跑通了。
-
-![正文配图](<../../assets/manuscript-20260914/c20-2778aa92ca4f07.webp>)
-
-原帖：https://x.com/rizavelioglu/status/2000012841525649621
-
-<p></p>
-
-写实人像这块，<span>@</span>dreamydigiarts 做了一组同提示词对比。
-
-他让 Z-Image-Turbo 和 Nano Banana 2 同时生成一张手机仰拍：蓝天、逆光、人物后仰、手里抱着一大束野花，头发被风吹起来，还要求保留手机照片那种轻微颗粒感。
-
-Z-Image 给出的画面已经有很强的随手拍味道。牛仔裤、皮肤和逆光没有糊成一层塑料，仰拍构图也没问题。拿来做人物氛围图、社媒配图，已经完全不是玩具级别。
-
-![正文配图](<../../assets/manuscript-20260914/c20-1692e5595374ae.webp>)
-
-![正文配图](<../../assets/manuscript-20260914/c20-7b130b1305b0e0.webp>)
-
-原帖：https://x.com/dreamydigiarts/status/2084233075245171142
-
-<p></p>
-
-Z-Image 也不只会写实，<span>@</span>tisch&#95;eins 用同一条提示词测试了 Boogu、Flux 2 Klein 和 Z-Image-Turbo。画面要求一个黑发女术士站在暴风雨山顶，手里的金色法杖必须从手到顶端完整出现，一道闪电从杖尖直冲云层，同时还要有低机位、全身构图、披风、符文、电弧和强烈的金色轮廓光。
-
-这种 prompt 很容易顾此失彼：法杖被裁掉，闪电接错位置，人物也可能只剩一个大头。Z-Image 的结果把主要关系都保持住了，说明它对复杂插画构图也较强的控制力。
-
-![正文配图](<../../assets/manuscript-20260914/c20-f95dd32bae9f1e.webp>)
-
-原帖：https://x.com/tisch_eins/status/2081490372405174375
-
-<p></p>
-
-最后一个是极端微距，<span>@</span>aisthetiic 的提示词很短：让某种动物的瞳孔占据画面主体，用左上方的戏剧光线照出虹膜纹理，背景做成由暗到亮的虚化渐变。
-
-更有意思的是，画面没有散。视线被牢牢锁定在瞳孔上，光线、阴影和背景都在给同一个主体服务。做海报主视觉或者情绪化封面时，这种构图服从度比堆一万句“8K、杰作、超细节”都有用。
-
-![正文配图](<../../assets/manuscript-20260914/c20-b5f58339b18a57.webp>)
-
-原帖：https://x.com/aisthetiic/status/1994424107451007336
-
-<p></p>
-
-这 5 个 case 放在一起看，Z-Image 的优势还是很明显了：
-
-模型不大、速度快、写实能力在线，而且能听懂比较长的自然语言。完整底模还可以继续做 LoRA、ControlNet 和行业微调。
-
-<p></p>
+位置先由用户输入，不把它交给模型生成，能避免照片里没有楼层信息却产生一个貌似完整的位置。拍摄时间也应来自业务应用，不依赖模型对“现在”的判断。
 
 <a id="c21-s3"></a>
 
-## <strong>MiniMax H3，开源视频开始有导演感了</strong>
+## 2\. 先在 Notebook 中验证单图理解
 
-生视频比生图难得多，一张图里画错一根手指，有时候还能裁掉。视频里角色 15 秒不换脸、镜头按时间走、台词不串人、音效跟动作对上，任何一项掉链子，整条片子就废了。
+模型入口为 [魔搭 MiniCPM-V 4.6](<https://modelscope.cn/models/OpenBMB/MiniCPM-V-4.6>)。它支持图像、视频与文本输入。本章只使用单张图片，不同时引入语音、视频流和工具调用。
+
+在魔搭 Notebook 中打开配套 `notebooks/02_minicpmv_inspection_baseline.ipynb`，下载固定模型版本，上传一张自己拥有使用权限的图片。模型代码采用官方的 Transformers 路线：
+
+```bash
+python -m pip install 'transformers==5.7.0' 'modelscope==1.33.0' \
+  accelerate Pillow torchvision av
+```
+
+保留与 Notebook CUDA 相匹配的 PyTorch / torchvision 组合，避免为了一个单图实验升级整个 CUDA 软件栈。本章初稿未记录 GPU 峰值显存，应在正式验证中填写。官方仓库根目录的旧 requirements 包含早期模型依赖，不应直接替代 4.6 对应的推理说明。
+
+运行下载单元格后，使用配套脚本：
+
+```bash
+python examples/vision_baseline.py \
+  --model models/minicpm-v-4.6 \
+  --image 自己的现场照片.jpg \
+  --downsample 16x \
+  --out results/inspection-one.json
+```
+
+脚本的核心调用如下：
+
+```python
+inputs = processor.apply_chat_template(
+    messages, tokenize=True, add_generation_prompt=True,
+    enable_thinking=False, return_dict=True, return_tensors="pt",
+    downsample_mode="16x", max_slice_nums=1
+).to(model.device)
+
+generated_ids = model.generate(
+    **inputs, downsample_mode="16x",
+    do_sample=False, max_new_tokens=384
+)
+```
+
+使用与当前模型匹配的 `AutoProcessor`、`AutoModelForImageTextToText` 和系统提示。`downsample_mode` 必须在预处理和生成两处保持一致，否则图像占位与视觉特征可能不匹配。
+
+16x 与 4x 是精度和计算开销的取舍，不能用一般性的“更快”承诺替代具体巡检图片测试。初始设置 `max_slice_nums=1` 是为了限制资源；细小文字、远处裂痕或大场景可能需要增加切片、改用 4x 或重新近距离拍摄。手机工程使用自己的视觉处理接口，不应把 Notebook 的参数名直接假定为手机中同名设置。
+
+脚本同时保存原始回答和结构校验结果。合法 JSON 只证明结构满足要求，是否看对图片需要人工标注与核对。如果原始输出不合法，保留错误，允许重新生成或手工填写，不将非法输出“修一下”后计为识别成功。
+
+<a id="c21-s4"></a>
+
+## 3\. 组织现场图片与标准记录
+
+首轮至少覆盖清晰、暗光、模糊、遮挡、正常场景和缺少位置的输入。样本使用自己拍摄且可公开的照片，或已有明确授权的图片；配套包未附带真实巡检照片，不能把 JSON 示例当成视觉测试集。数据集链接：https://modelscope.cn/datasets/pzc163/minicpm-v-inspection-part5
+
+为每张图片建立标注记录：
+
+```json
+{
+  "sample_id": "inspection-001",
+  "image": "images/inspection-001.jpg",
+  "location_input": "二层东侧走廊",
+  "acceptable_objects": ["灯罩"],
+  "required_observations": ["可见破损"],
+  "unsupported_claims": ["电路故障", "必须更换整灯"],
+  "quality_group": "clear",
+  "source": "自有拍摄并获授权",
+  "license": "由图片作者填写实际许可"
+}
+```
+
+同一处对象连拍的照片应属于同一划分，不能一张调试、一张最终测试，以免把相近图片重复算成泛化能力。标准答案允许必要的同义表述，语义准确率由人工或明确规则判定；只有固定字段和类型适合完全自动校验。
+
+将可公开的图片、标注、许可与划分说明上传魔搭数据集仓库，Notebook 先从这个数据版本下载。真实业务照片可继续保留在设备上，不需要为了托管教学资产公开客户现场资料。
+
+<a id="c21-s5"></a>
+
+## 4\. 让真实手机完成图像推理
+
+主路线复用 [MiniCPM-V Apps 的 Android 工程](<https://github.com/OpenBMB/MiniCPM-V-Apps/tree/d1aac05eecaac64b7fc35f1cc93a06b726ce10e3>)。先安装官方 Demo，选择 MiniCPM-V 4.6，下载相匹配的语言模型 GGUF 与视觉投影文件 `mmproj-model-f16.gguf`。视觉组件缺失、版本不匹配或加载失败时，文本模型能回答问题不代表图像推理已经工作。
+
+本章在移动端优先复用官方发布且被该工程支持的模型包，不自行重做视觉转换。把下载来源、固定版本、两个文件的哈希与应用提交记录到部署清单。若要重新转换视觉模型，须使用模型团队确认的转换器与投影配置，再重新做实机验收，不能沿用文本模型的单文件转换脚本。
+
+进行业务界面开发时，克隆并固定工程：
+
+```bash
+git clone https://github.com/OpenBMB/MiniCPM-V-Apps.git vendor/MiniCPM-V-Apps
+git -C vendor/MiniCPM-V-Apps checkout d1aac05eecaac64b7fc35f1cc93a06b726ce10e3
+git -C vendor/MiniCPM-V-Apps submodule update --init --recursive
+```
+
+将 `android/InspectionRunner.kt` 和 `android/InspectionRecordStore.kt` 复制到工程同包名的 Kotlin 源码目录。它们分别封装模型草稿生成、严格字段解析、本地确认记录和显式同步。组件用于接入已有 Android 界面，本初稿没有提供完整巡检 APK。
+
+官方引擎提供的调用链是：
+
+```kotlin
+engine.setEnableThinking(false)
+engine.clearContext()
+engine.setSystemPrompt(InspectionContract.PROMPT)
+engine.prefillImage(jpegBytes)
+engine.sendUserPrompt("请提取图中可见的对象和现象。", predictLength = 384)
+```
+
+实际代码由 `InspectionRunner.generate` 收集流式结果后进行解析。它要求模型和视觉组件已经加载，并用互斥锁保证同一引擎不会同时处理两张图片。每条巡检先清除历史上下文，避免上一处设备的观察混入下一条记录。
+
+`isVisionSupported` 必须为 true 才能进入业务推理。当前工程在视觉组件加载失败时可能继续文本模式，因此业务层要明确拦截这一状态。
+
+<a id="c21-s6"></a>
+
+## 5\. 从 Demo 变成现场工作界面
+
+第一版界面可以由“采集、草稿确认、记录列表”三个页面组成。按照顺序实现以下行为：
+
+1. 调用相机或选择相册图片，立刻复制到应用私有文件目录并建立草稿 ID。保留原图，推理使用校正 EXIF 方向后的 JPEG 副本；显示预览并提供重拍。
+2. 用户选择位置。现场拍照记录应用采集时间；相册导入保留导入来源，照片时间未知时提示人员核对，不能把导入时间伪装成原始拍摄时间。
+3. 点击生成后，显示模型加载、图片预处理和生成状态。先保证照片与输入已保存，再运行模型；失败或中断不能丢掉已拍照片。
+4. 把模型对象与可见现象放进可编辑表单。JSON 非法、字段缺失或建议重拍时，展示相应提示，允许重拍或手工填写。
+5. 用户核对图片、位置与观察后点击确认，生成冻结的正式记录，在一个本地数据库事务中保存记录与待同步状态。
+6. 在记录列表明确区分“仅保存在手机”“同步成功”“同步失败”，点击同步按钮才发送确认过的记录。
+
+照片处理时可先使用长边 1280 像素作为候选，而不是把大图不加限制地交给手机。应记录实际压缩参数，并用细小缺陷与暗光样例检查信息是否被压缩丢失。为防止重复推理和修改时错配，按钮状态、图片哈希与草稿 ID 应一起管理。
+
+下面展示已加载引擎上的生成入口。`jpegBytes` 是上一步准备好的图片，`scope` 为页面生命周期作用域：
+
+```kotlin
+val runner = InspectionRunner(engine) // 页面保留同一个实例
+scope.launch {
+    try {
+        val draft = runner.generate(jpegBytes)
+        // 将字段绑定到可编辑表单；不在这里自动确认或同步。
+        showEditableDraft(draft)
+    } catch (e: Exception) {
+        // 保存照片与位置，显示重新生成、重拍或手工填写入口。
+        showGenerationFailure()
+    }
+}
+```
+
+`showEditableDraft`、`showGenerationFailure` 是界面事件示意，需要按所用 Activity 或 Fragment 实现。完整应用定稿时，应连同相机权限、相册选择、旋转恢复、图片预处理和按钮事件一起构建验证。
+
+保存正式记录时，应用生成 UUID、图片哈希、确认人和确认时间，将人员核对后的观察写入 `InspectionRecordStore.saveConfirmed`。两项观察字段仍为空时，不进入同步队列；若人员选择手工填写，记录其实际确认动作。正式记录一旦确认不再原地改写，后续更正以新记录关联原记录，避免同步重试提交不同内容。
+
+<a id="c21-s7"></a>
+
+## 6\. 实现离线保存和联网同步
+
+手机本地数据库保存确认记录和待同步队列，图片仍在设备私有目录。本示例同步结构化观察、位置和图片哈希，不上传原图。哈希只能用于关联与校验，后台不能凭哈希查看照片；若业务需要查看照片，应另做由用户选择的附件上传并记录同步范围。
+
+配套提供标准库实现的模拟台账：
+
+```bash
+python examples/ledger.py --bind 127.0.0.1 --port 8787 --db ledger.sqlite3
+```
+
+为了先学习业务链路，不依赖 GPU，在第二个终端用示例确认记录运行：
+
+```bash
+python examples/offline_queue.py add data/inspection_confirmed_example.json
+python examples/offline_queue.py pending
+python examples/offline_queue.py sync --url http://127.0.0.1:8787
+```
+
+这个 JSON 是教学夹具：图片哈希为占位值，模型版本标注 `teaching-fixture-no-inference`。这些命令验证保存、同步和接口，不验证视觉模型，也不证明手机部署。
+
+手机连接时可使用 USB 调试的端口反向映射，让手机上的回环地址转发到电脑台账：
+
+```bash
+adb reverse tcp:8787 tcp:8787
+```
+
+为本地教学的 HTTP 连接在 Debug 构建配置相应的网络策略；正式服务使用 TLS 和业务账号鉴权。本地服务默认只监听电脑回环地址。应用中的同步操作需要在 IO 线程运行：
+
+```kotlin
+scope.launch {
+    val result = withContext(Dispatchers.IO) {
+        recordStore.syncPending("http://127.0.0.1:8787")
+    }
+    showSyncResults(result)
+}
+```
+
+<a id="c21-s8"></a>
+
+### 用记录 ID 防止重复提交
+
+手机同步时不能假定“请求超时就意味着后台没有保存”。一种常见情况是后台已经写入，回复在传输中丢失。如果手机重新生成 ID 再提交，会出现两条相同记录。
+
+本示例采用以下约定：同一正式记录始终使用同一 UUID；相同 ID、相同内容的重复 POST 返回已经存在的记录；相同 ID、不同内容返回 409 冲突。手机只有收到 200 或 201 且确认回复中的记录内容相同，才把队列项标为同步成功。超时、鉴权失败和冲突都保留待同步项。
+
+<table><thead><tr><th><p>接口</p></th><th><p>输入</p></th><th><p>行为</p></th></tr></thead><tbody><tr><td><p><code>POST /records</code></p></td><td><p>人工确认过的完整记录</p></td><td><p>新记录返回 201；相同内容重试返回 200；内容冲突返回 409</p></td></tr><tr><td><p><code>GET /records</code></p></td><td><p>无</p></td><td><p>返回台账列表与处理状态</p></td></tr><tr><td><p><code>GET /records/{record_id}</code></p></td><td><p>记录 ID</p></td><td><p>返回该记录和当前服务端版本</p></td></tr><tr><td><p><code>PATCH /records/{record_id}/status</code></p></td><td><p><code>status</code>、<code>expected_version</code></p></td><td><p>更新状态并增加版本；旧版本更新返回 409</p></td></tr></tbody></table>
+
+台账将处理状态保存在观察内容之外。后台从 `pending` 改为 `in_progress` 或 `closed` 时，不覆盖模型观察或人员确认字段。手机通过 `refreshStatus` 显式刷新处理结果。
+
+可以先用 `GET /records` 找到实际 ID 和当前版本，再更新状态：
+
+```bash
+curl http://127.0.0.1:8787/records
+curl -X PATCH \
+  http://127.0.0.1:8787/records/e30ac04c-56d6-4c8e-b005-1d62c567e247/status \
+  -H 'Content-Type: application/json' \
+  -d '{"status":"closed","expected_version":1}'
+```
+
+上面的 UUID 只对应配套教学夹具，现场记录应使用手机生成的实际 ID。再读取台账或刷新手机状态，即可观察已关闭状态。模拟服务没有完整的人员组织、工单权限和生产审计功能，不能直接作为生产台账部署。
+
+<a id="c21-s9"></a>
+
+## 7\. 分别验证识别效果、手机表现和业务闭环
+
+三类验证回答不同问题：模型有没有看对、手机能不能稳定运行、记录有没有可靠地流转。任何一项成功都不能替代其余两项。
+
+<a id="c21-s10"></a>
+
+### 7.1 模型输出与人工修改
+
+<table><thead><tr><th><p>指标</p></th><th><p>统计口径</p></th></tr></thead><tbody><tr><td><p>结构合法率</p></td><td><p>原始输出直接通过字段与类型校验的样本比例</p></td></tr><tr><td><p>对象准确率</p></td><td><p>与人工标注的可接受对象一致的比例，允许事先定义的同义词</p></td></tr><tr><td><p>可见现象准确率</p></td><td><p>描述符合照片可见证据的比例，由标注规则与人工审阅判断</p></td></tr><tr><td><p>无依据补充率</p></td><td><p>出现照片和输入不支持的物体、成因或处置断言的比例</p></td></tr><tr><td><p>人工修改率</p></td><td><p>需要修改对象或现象的草稿占比，保留修改前后内容</p></td></tr><tr><td><p>补拍与失败率</p></td><td><p>因模糊、暗光、字段缺失、推理中断等无法直接确认的比例</p></td></tr></tbody></table>
+
+同一图片在 Notebook、手机原精度或量化版本中分别测试，确认差异来自哪一环。EvalScope 可组织自定义视觉问答数据与报告，业务字段和无依据补充仍需独立规则或人工评审；本初稿没有宣称已完成 EvalScope 视觉评测。
+
+<a id="c21-s11"></a>
+
+### 7.2 手机实际体验
+
+<table><thead><tr><th><p>项目</p></th><th><p>需记录的信息</p></th><th><p>本稿结果</p></th></tr></thead><tbody><tr><td><p>设备与部署</p></td><td><p>机型、系统、应用提交、模型与 mmproj 哈希</p></td><td><p>荣耀 Magic9 Pro Max，型号 <b>WKL-AN80</b>；Android <b>17 / API 37</b>，arm64，4 KiB 内存页。当前发布版本为 <b>MiniCPM-V 巡检实践版 v23 / 2.5</b>，包名 <code>com.example.minicpm_v_demo.practice</code>。原首页、聊天及模型下载入口保留；首次安装后通过 App 下载语言与视觉权重，并通过 SHA256 校验。固定提交与哈希见下文。</p></td></tr><tr><td><p>加载时间</p></td><td><p>冷加载到可处理图片的时间</p></td><td><p><b>v20：连续测试加载 3.916 秒，另一次实际 UI 加载 2.220 秒</b>。两次均未清除系统文件缓存，不能视为清缓存后的存储冷启动。v23 加载功能通过，尚无同口径加载耗时统计。</p></td></tr><tr><td><p>首字延迟</p></td><td><p>包含图片预处理、视觉编码和提示处理的延迟</p></td><td><p><b>v23：成功生成的一次实测为 7.986 秒</b>，包含生成阶段的图片预处理与读取。<b>v20：20 图平均 13.1668 秒，中位数 13.0675 秒</b>；该批次使用预先准备的 JPEG，不含相机／相册预处理。</p></td></tr><tr><td><p>单条记录耗时</p></td><td><p>从生成按钮到完整草稿可编辑</p></td><td><p><b>v23：成功生成并解析完成为 19.927 秒</b>；此前一次生成耗时 <b>15.236 秒</b>，因非法 JSON 被拦截，未闪退，照片和字段保留。<b>v20：20 图平均 21.571 秒，中位数 21.765 秒，P95 为 27.185 秒</b>。这些数值不含人工核对、填写时间；按钮点击到编辑界面完成绘制的严格端到端耗时未单独测量。</p></td></tr><tr><td><p>资源</p></td><td><p>进程峰值内存、图片尺寸、切片与上下文配置</p></td><td><p><b>v20：每秒采样的峰值 PSS 为 2,393,000 KiB，约 2.28 GiB；RSS 高水位为 2,513,636 KiB，约 2.40 GiB</b>。输入为 <b>227×227 JPEG</b>；切片上限 <b>1</b>、上下文 <b>8192</b>、CPU 线程 <b>4</b>、最多生成 <b>384 token</b>、温度 <b>0.7</b>、关闭思考。v23 相机预处理支持最长边缩至 <b>1280</b>，已通过 8 种 EXIF 方向与 48MP 图片测试；整改后的多进程总内存峰值尚未重测。</p></td></tr><tr><td><p>连续使用</p></td><td><p>连续 20 张，延迟变化、失败、发热与电量变化</p></td><td><p><b>v20：单次加载后连续处理 20 张不同公开裁剪图，20/20 返回原始回答，无闪退；19/20 通过严格结构校验</b>，1 次非法 JSON 被拒绝。前 5 张平均 <b>22.862 秒</b>，后 5 张平均 <b>16.966 秒</b>；输入内容与输出长度不同，不能据此判断热降频。电池温度 <b>40→42°C</b>，全程充电，电量 <b>100%→100%</b>，不据此估算耗电。v23 尚未重跑此批次。</p></td></tr><tr><td><p>飞行模式</p></td><td><p>新图片在断网状态生成草稿并保存</p></td><td><p>已通过。早期真机新拍照片在断网状态生成耗时 <b>17.575 秒</b>，确认后进入本地队列；恢复网络后显式同步，台账仅保留一条。<b>v23 另在飞行模式开启、Wi-Fi 关闭、无 ADB 反向网络映射时</b>导入公开图片，完成本地生成、人工确认和保存；同步失败时记录保留，恢复网络后主动同步成功，并完成状态刷新。</p></td></tr></tbody></table>
+
+<strong>部署校验信息</strong>：<br>
+MiniCPM-V-Apps 上游提交
+
+`d1aac05eecaac64b7fc35f1cc93a06b726ce10e3`
+
+原生子模块提交
+
+`13401aa8480d68a725e131cc4dbe5eda1f996a7f`
+
+语言模型
+
+`MiniCPM-V-4_6-Q4_K_M.gguf`，529,101,504 字节
+
+语言模型 SHA256
+
+`6b0c74962c44bc6bf4b655b9b02c13eda9d5a0491543ae976d1ac18e4b7892e2`
+
+视觉组件
+
+`mmproj-model-f16.gguf`，1,108,746,944 字节
+
+视觉组件 SHA256
+
+`ca931d861d0801d9003e50697cd764721a334107c0e0415a51168ee1938462de`
+
+v23 发布 APK SHA256
+
+`6615b7de73245a2dde9f45dae12da46298fe46bc97022a24329213afedba1283`
 
 <p></p>
 
-H3 的 case 里，最值得先看的就是双角色一致性。
+所有数字应来自真实手机、具体模型包和相同测试口径。云端 Notebook 只负责算法基线；手机浏览器访问云端页面也不能作为本地推理证明。
 
-<span>@</span>coolthor 给 H3 的 Ref2VA 模式喂了两张 Z-Image 生成的角色设定图。一个穿赭色长袍，一个穿蓝灰色衣服，外形故意拉开差异。提示词安排其中一名角色在第 6 到 8 秒入场，还写了三句中文对白。
+<a id="c21-s12"></a>
 
-10.125 秒的视频里，两个人没有互相“串脸”“串衣服”。该入场的角色在前半段没出现，到 7 秒左右才进画面。作者又拿 ASR 对 44 个汉字做了核对，字符错误率是 6.8%，错的还是同音字。
+### 7.3 失败场景与流转可靠性
 
-这条是在单张 RTX 5090 上跑的，243 帧用了 437 秒。速度谈不上非常快，但角色、时间和对白可以一起控制，已经很能打了。
+<table><thead><tr><th><p>场景</p></th><th><p>正确行为</p></th></tr></thead><tbody><tr><td><p>视觉组件加载失败</p></td><td><p>停止图像生成，显示组件错误，不继续伪装图像理解</p></td></tr><tr><td><p>模糊或暗光图片</p></td><td><p>提示补拍或手工填写，保留原图与位置</p></td></tr><tr><td><p>输出不是合法 JSON</p></td><td><p>保留原始输出用于排查，表单不自动确认</p></td></tr><tr><td><p>生成期间应用中断</p></td><td><p>已采集照片与位置可以恢复</p></td></tr><tr><td><p>飞行模式确认记录</p></td><td><p>保存到本地队列，不等待网络请求</p></td></tr><tr><td><p>台账已写入但 ACK 丢失</p></td><td><p>用同一 ID 与内容重试，台账仍只有一条</p></td></tr><tr><td><p>同一 ID 内容发生变化</p></td><td><p>返回冲突，不覆盖已保存观察</p></td></tr><tr><td><p>两次后台状态更新冲突</p></td><td><p>用版本号发现冲突，刷新后再决定</p></td></tr></tbody></table>
 
-![正文配图](<../../assets/manuscript-20260914/c20-21399ea076ac36.webp>)
+配套 `examples/verify_local.py` 已验证 Python 校验与模拟业务链路，包括离线队列恢复、HTTP 同步、重复提交和版本冲突。Android 生命周期恢复、相机与 native 引擎不在这组本地检查的覆盖范围，应在应用实机验收中补测。
 
-![正文配图](<../../assets/manuscript-20260914/c20-66554ca06322ab.webp>)
+<a id="c21-s13"></a>
 
-[案例 6-H3 双角色中文对白-完整 10 秒.mp4](<../../assets/manuscript-20260914/c20-7d9146c1b9d02e.mp4>)
+## 8\. 魔搭平台怎样承接这些实践资产
 
-原帖：https://x.com/coolthor/status/2096779996320719307
+<table><thead><tr><th><p>平台能力</p></th><th><p>本章用途</p></th><th><p>应发布的资产</p></th></tr></thead><tbody><tr><td><p>模型库</p></td><td><p>提供固定基座、手机模型包与视觉组件</p></td><td><p>版本、文件哈希、部署说明</p></td></tr><tr><td><p>数据集</p></td><td><p>托管公开授权图片与人工标注</p></td><td><p>图片、标准记录、划分与许可</p></td></tr><tr><td><p>Notebook</p></td><td><p>验证单图理解与输出契约</p></td><td><p>可执行 Notebook、原始输出及配置</p></td></tr><tr><td><p>EvalScope</p></td><td><p>组织效果比较和报告</p></td><td><p>数据适配、评测配置与失败分析</p></td></tr><tr><td><p>创空间 Studio</p></td><td><p>展示台账与教学样例</p></td><td><p>示例记录、接口说明、APK 下载与手机验收材料</p></td></tr></tbody></table>
 
-<p></p>
+创空间中的网页台账可以帮助读者理解流程。网页如果调用服务器模型，应明确标注云端体验；核心验收仍然是在手机断网状态下拍摄新图片并生成记录。第一版台账可以由开发者在本地运行，Studio 发布入口由双方实际创建后补入。
 
-另一条本地 case 来自 <span>@</span>Lumosous。
+<a id="c21-s14"></a>
 
-他用 RTX 4090 和 ComfyUI 做了三种尝试：四场景旅行短片、跟着鼓点切换画面的音乐视频，以及带 4 个镜头和环境声的海边故事。原始想法先交给 MiniMax 官方的 Prompt Writing Skill，整理成带镜头、时间、动作和声音的结构化提示词，再丢给 H3。
+## 9\. 升级到 MiniCPM-V 4.7 时保持任务契约
 
-这条最有用的地方，是它不只把画面做得“挺漂亮”。鼓点到了，画面真会跟着换；海边那条里，四个镜头、氛围和背景音能在一轮里一起出来。
+4.7 是后续可选的模型升级方向。升级前固定具体型号、正式模型页、语言权重、视觉组件、转换工具与手机引擎，不仅更换模型名称。相同巡检图片、相同标注与相同手机用于重新测量效果和资源成本。
 
-他的实测数据：4090 跑 15 秒、20 步的低分辨率视频要 200 多秒；升到 768p 就要 1000 多秒。开源可以让你反复改，但免费不等于没有成本，电费、显存和等待时间也是成本。
+可以按以下顺序迁移：先通过 Notebook 单图和结构输出，再通过手机单图理解与飞行模式推理，最后接回人工确认、离线队列与台账。是否采用 1B 或 35B-A3B 路线，由目标设备资源和端侧实测决定。不能将其他版本、其他机型或其他提示条件下的内存与速度数字直接写入本章。
 
-![正文配图](<../../assets/manuscript-20260914/c20-145acd757537f0.webp>)
+最终完成标志是：另一位开发者能在受支持手机上拍摄一张新图片，断网生成草稿、人工确认并离线保存；联网后点击同步，在台账中看到唯一记录，再查看后续处理状态。模型文件、应用版本与实际手机指标应可以追溯。
 
-[案例 7-H3 本地工作流-演示节选 22 秒.mp4](<../../assets/manuscript-20260914/c20-6bd384c463328e.mp4>)
+<a id="c21-s15"></a>
 
-原帖：https://x.com/Lumosous/status/2089351551361937490
+## 参考资料
 
-<p></p>
+- [MiniCPM-V 官方图像推理说明](<https://github.com/OpenBMB/MiniCPM-V#minicpm-v-46>)
+- [MiniCPM-V 4.6 模型页](<https://modelscope.cn/models/OpenBMB/MiniCPM-V-4.6>)
+- [MiniCPM-V Apps 固定手机工程](<https://github.com/OpenBMB/MiniCPM-V-Apps/tree/d1aac05eecaac64b7fc35f1cc93a06b726ce10e3>)
+- [Android LlamaEngine 图像预填充与推理接口](<https://github.com/OpenBMB/MiniCPM-V-Apps/blob/d1aac05eecaac64b7fc35f1cc93a06b726ce10e3/MiniCPM-V-demo-Android/app/src/main/java/com/example/minicpm_v_demo/LlamaEngine.kt>)
+- [业务背景参考：PilotDeck 开发在线智能数据系统](<https://modelbest.feishu.cn/wiki/Up4Owx87uiZLx0kFs3PcqjLYnch>)，仅沿用合作方案列出的业务方向，不据此认定已有手机巡检实现。
 
-<span>@</span>PixelAigc 做的 30 秒《简·爱》式英伦庄园片段更夸张。
-
-他的提示词直接把 30 秒拆成 4 个镜头。每段写清焦段、机位、人物站位、微表情、对白、呼吸、环境音和禁止项。人物情绪从试探、反驳一路走到动容，男女声线也分别约束。
-
-这条片子用的是本地 ComfyUI、H3 Turbo LoRA，先出 480p，再用 Topaz 超到 1080p。作者给出的时间是，25 秒大约要 13 到 15 分钟。它不能代表官方原版模型的裸跑效果，但能代表开源生态最有意思的地方：模型出来一个月，社区已经开始改速度、做长视频、接自动超分了。
-
-![正文配图](<../../assets/manuscript-20260914/c20-2fe3efcf3dbfde.webp>)
-
-[案例 8-H3 英伦庄园多镜头对白-完整 30 秒.mp4](<../../assets/manuscript-20260914/c20-5139f6a635a7e1.mp4>)
-
-原帖：https://x.com/PixelAigc/status/2093563293306929579
-
-<p></p>
-
-H3 官方单段上限是 15 秒，那更长的视频怎么做？
-
-<span>@</span>superalesha 用 4 张 RTX 3090 跑了一条 30 秒第一人称动作片。他把两个 15 秒片段串起来，前一段故意停在一个稳定画面，后一段从同一帧接着生成，再把重复帧剪掉，声音继续往后走。
-
-成片的接缝藏在第 15 秒，正常看很难发现。整条片从生成到完成用了 44 分钟。这个 case 的价值不在于 H3 突然突破了时长限制，而是有人把限制研究明白以后，用工作流绕过去了。
-
-![正文配图](<../../assets/manuscript-20260914/c20-2e30c4ea95fddb.webp>)
-
-[案例 9-H3 双段串联第一人称动作片-完整 30 秒.mp4](<../../assets/manuscript-20260914/c20-2b841bfdc3eae3.mp4>)
-
-原帖：https://x.com/superalesha/status/2086171185134686509
-
-<p></p>
-
-还有一个特别适合拿来研究“视频提示词到底该怎么写”的 case。
-
-<span>@</span>ou&#95;zhen599 用本地 ComfyUI 做了一段 15 秒赛博飞船短片。画面里有三名女性角色，一人一直坐在左边，一人站在中间拿刀，一人站在右前方拿汽水罐。提示词不只写剧情，还规定谁在第几秒说话、没说话的人不能动嘴、汽水罐必须一直留在右手、红色追踪点什么时候出现在屏幕上，最后舷窗外的阴影再压过来。
-
-这种 case 最难的是空间别乱、道具别丢、台词别串、沉默的人真能闭嘴。H3 已经能把这么多约束塞进一条 15 秒短片里执行，开源视频的玩法明显变了。
-
-![正文配图](<../../assets/manuscript-20260914/c20-58907f0c3e3aa4.webp>)
-
-[案例 10-H3 赛博飞船多角色对白-完整 15 秒.mp4](<../../assets/manuscript-20260914/c20-7b0dbb64916194.mp4>)
-
-原帖：https://x.com/ou_zhen599/status/2097988690102390893
-
-<p></p>
-
-<p></p>
-
-总的来看，
-
-如果你只是想最快出一条成片，闭源模型依然省事。
-
-但如果你想反复试、批量生成、训练自己的风格，或者把能力装进本地工作流，Z-Image 和 H3 已经值得认真研究了。先用开源模型把镜头和素材咔咔咔试出来，真正卡住的时候再调用闭源模型，成本会低很多。
-
-开源模型以前给人的感觉是等等党平替，现在它已经能参与真正的创作了。
-
-对天天要做图、做视频的人来说，最爽的变化就是，以后每冒出一个想法，不用先算这一轮要烧掉多少积分。
+[MiniCPM&#95;魔搭紫皮书&#95;章节与实践包&#95;v0.1.zip](<../../assets/minicpm-20261015/minicpm-practice-v0.1.zip>)
 
 <p></p>

@@ -33,14 +33,14 @@ def test_renumbering_keeps_notes_with_original_article(site):
     with site[0].state.db() as db:
         for eid,chapter,kind in [('case','chapter-20','comment'),('agent','chapter-33','annotation'),('private','chapter-20','highlight')]:
             db.execute('INSERT INTO entries VALUES (?,?,?,?,?,?,?,?,?,?)',(eid,chapter,'alice',kind,eid,'original quote',1,0,14,10))
-    case='/api/chapters/chapter-21/entries'
-    agent='/api/chapters/chapter-26/entries'
+    case='/api/chapters/chapter-23/entries'
+    agent='/api/chapters/chapter-28/entries'
     assert {x['id'] for x in c.get(case).json()['items']}=={'case','private'}
     assert c.get(agent).json()['items'][0]['id']=='agent'
-    assert c.get(agent).json()['items'][0]['chapter']=='chapter-26'
-    assert c.get('/api/chapters/chapter-20/entries').json()['items']==[]
-    assert c.get('/api/chapters/chapter-33/entries').json()['items']==[]
-    assert c.get('/api/chapters/chapter-24/entries').status_code==404
+    assert c.get(agent).json()['items'][0]['chapter']=='chapter-28'
+    assert c.get('/api/chapters/chapter-22/entries').json()['items']==[]
+    assert c.get('/api/chapters/chapter-35/entries').json()['items']==[]
+    assert c.get('/api/chapters/chapter-26/entries').status_code==404
     guest=TestClient(site[0])
     assert {x['id'] for x in guest.get(case).json()['items']}=={'case'}
     response=c.post(agent,json={'kind':'comment','text':'new comment'})
