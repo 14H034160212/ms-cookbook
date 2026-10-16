@@ -34,7 +34,7 @@ A useful model application starts with practical decisions: which model fits the
 
 The goal is to help developers move from a first successful inference to applications they can reproduce, evaluate, and improve. Examples cover enterprise knowledge Q&A, speech assistants, customer-service quality analysis, fitness coaching, product-image creation, and production-line inspection.
 
-> **8 parts · 37 chapters · 36 available to read**
+> **8 parts · 38 chapters · 37 available to read**
 
 ## Start reading
 
@@ -60,8 +60,8 @@ Reading locally requires Python 3 and a modern browser; it requires no project d
 | --- | --- | --- |
 | **Get started** | [01](content/chapters/chapter-01.md) → [05](content/chapters/chapter-05.md) → [07](content/chapters/chapter-07.md) | Understand models, define a task, and run a first inference |
 | **Adapt a model** | [13](content/chapters/chapter-13.md) → [14](content/chapters/chapter-14.md) → [16](content/chapters/chapter-16.md) | Prepare training data, fine-tune, and evaluate against a baseline |
-| **Build an application** | [20](content/chapters/chapter-20.md) → [29](content/chapters/chapter-29.md) → [30](content/chapters/chapter-30.md) | Combine knowledge retrieval, external tools, and reusable skills |
-| **Create with generative AI** | [23](content/chapters/chapter-23.md) → [24](content/chapters/chapter-24.md) → [25](content/chapters/chapter-25.md) → [27](content/chapters/chapter-27.md) | Explore examples, customize image LoRA, create product visuals, and study the foundations |
+| **Build an application** | [20](content/chapters/chapter-20.md) → [30](content/chapters/chapter-30.md) → [31](content/chapters/chapter-31.md) | Combine knowledge retrieval, external tools, and reusable skills |
+| **Create with generative AI** | [23](content/chapters/chapter-23.md) → [24](content/chapters/chapter-24.md) → [25](content/chapters/chapter-25.md) → [26](content/chapters/chapter-26.md) → [28](content/chapters/chapter-28.md) | Explore examples, customize image LoRA, create product visuals, and study the foundations |
 
 ### Who is this for?
 
@@ -108,20 +108,21 @@ Read each chapter on GitHub, or use the [online reading website](https://modelsc
 | [23 · 10 个 Case，带你看看 AIGC 的开源模型能做到什么地步](content/chapters/chapter-23.md) | Open generative-model use cases |
 | [24 · 定制？使用 DiffSynth 训练图像 LoRA](content/chapters/chapter-24.md) | Image LoRA customization with DiffSynth |
 | [25 · 一张商品营销图，从生成到修改怎么做？](content/chapters/chapter-25.md) | Product-image generation and editing |
-| [26 · 开源模型也能做出像样的 AI 视频吗？](content/chapters/chapter-26.md) | MiniMax H3 deployment tutorial pending |
-| [27 · 补充：AIGC 理论知识](content/chapters/chapter-27.md) | Image and video generation fundamentals |
+| [26 · 想要教学海报？要不试试让 AI 帮忙画一张](content/chapters/chapter-26.md) | Qwen-Image deployment and educational posters on ModelScope |
+| [27 · 开源模型也能做出像样的 AI 视频吗？](content/chapters/chapter-27.md) | MiniMax H3 deployment tutorial pending |
+| [28 · 补充：AIGC 理论知识](content/chapters/chapter-28.md) | Image and video generation fundamentals |
 | **Part 7 · Agents** | |
-| [28 · Agent 是什么，它能做什么事？](content/chapters/chapter-28.md) | Agent components, execution loop, and use cases |
-| [29 · MCP：让模型连接外部工具](content/chapters/chapter-29.md) | Connecting models to external tools |
-| [30 · Skill：把任务方法封装成能力](content/chapters/chapter-30.md) | Reusable task methods and workflows |
-| [31 · 快速使用 Claude Code](content/chapters/chapter-31.md) | Getting started with Claude Code |
-| [32 · 快速使用 PI](content/chapters/chapter-32.md) | Getting started with PI |
-| [33 · 快速使用 DeepSeek Harness](content/chapters/chapter-33.md) | Getting started with DeepSeek Harness |
-| [34 · 补充：Agent 框架知识](content/chapters/chapter-34.md) | Agent framework fundamentals |
-| [35 · 产线巡检 Agent：用 Penguin Harness 快速开发与优化](content/chapters/chapter-35.md) | Develop a production-line inspection Agent with Penguin Harness and optimize it through evaluation |
+| [29 · Agent 是什么，它能做什么事？](content/chapters/chapter-29.md) | Agent components, execution loop, and use cases |
+| [30 · MCP：让模型连接外部工具](content/chapters/chapter-30.md) | Connecting models to external tools |
+| [31 · Skill：把任务方法封装成能力](content/chapters/chapter-31.md) | Reusable task methods and workflows |
+| [32 · 快速使用 Claude Code](content/chapters/chapter-32.md) | Getting started with Claude Code |
+| [33 · 快速使用 PI](content/chapters/chapter-33.md) | Getting started with PI |
+| [34 · 快速使用 DeepSeek Harness](content/chapters/chapter-34.md) | Getting started with DeepSeek Harness |
+| [35 · 补充：Agent 框架知识](content/chapters/chapter-35.md) | Agent framework fundamentals |
+| [36 · 产线巡检 Agent：用 Penguin Harness 快速开发与优化](content/chapters/chapter-36.md) | Develop a production-line inspection Agent with Penguin Harness and optimize it through evaluation |
 | **Part 8 · Supplementary fundamentals** | |
-| [36 · 补充：大模型基础知识](content/chapters/chapter-36.md) | Model architecture, training, inference, and limitations |
-| [37 · 主流 LLM 评测](content/chapters/chapter-37.md) | Invitation to contribute evaluations of mainstream models |
+| [37 · 补充：大模型基础知识](content/chapters/chapter-37.md) | Model architecture, training, inference, and limitations |
+| [38 · 主流 LLM 评测](content/chapters/chapter-38.md) | Invitation to contribute evaluations of mainstream models |
 
 ## Application examples
 
@@ -132,7 +133,7 @@ Read each chapter on GitHub, or use the [online reading website](https://modelsc
 | Speech assistant | Connect speech recognition, model responses, and speech synthesis | [19](content/chapters/chapter-19.md) |
 | Enterprise knowledge assistant | Retrieve reference material for grounded answers | [20](content/chapters/chapter-20.md) |
 | Product marketing visuals | Generate and edit product images | [25](content/chapters/chapter-25.md) |
-| Production-line inspection | Develop a production-line inspection Agent with Penguin Harness and optimize it through evaluation | [35](content/chapters/chapter-35.md) |
+| Production-line inspection | Develop a production-line inspection Agent with Penguin Harness and optimize it through evaluation | [36](content/chapters/chapter-36.md) |
 
 ## Community
 
