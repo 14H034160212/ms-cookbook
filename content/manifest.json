@@ -1,6 +1,6 @@
 {
   "title": "魔搭紫皮书",
-  "sourceUpdated": "2026-10-15",
+  "sourceUpdated": "2026-10-16",
   "parts": [
     {
       "title": "第一篇　认识开源模型",
@@ -238,97 +238,105 @@
     },
     {
       "number": 26,
-      "title": "开源模型也能做出像样的 AI 视频吗？",
+      "title": "想要教学海报？要不试试让 AI 帮忙画一张",
       "partIndex": 5,
       "file": "source-html/chapter-26.html",
+      "status": "ready",
+      "discussionId": "qwen-image-21-teaching-poster"
+    },
+    {
+      "number": 27,
+      "title": "开源模型也能做出像样的 AI 视频吗？",
+      "partIndex": 5,
+      "file": "source-html/chapter-27.html",
       "status": "pending",
       "discussionId": "chapter-23"
     },
     {
-      "number": 27,
+      "number": 28,
       "title": "补充：AIGC 理论知识",
       "partIndex": 5,
-      "file": "source-html/chapter-27.html",
+      "file": "source-html/chapter-28.html",
       "status": "ready",
       "discussionId": "chapter-24"
     },
     {
-      "number": 28,
+      "number": 29,
       "title": "Agent 是什么，它能做什么事？",
       "partIndex": 6,
-      "file": "source-html/chapter-28.html",
+      "file": "source-html/chapter-29.html",
       "status": "ready",
       "discussionId": "chapter-33"
     },
     {
-      "number": 29,
+      "number": 30,
       "title": "MCP：让模型连接外部工具",
       "partIndex": 6,
-      "file": "source-html/chapter-29.html",
+      "file": "source-html/chapter-30.html",
       "status": "ready",
       "discussionId": "chapter-25"
     },
     {
-      "number": 30,
+      "number": 31,
       "title": "Skill：把任务方法封装成能力",
       "partIndex": 6,
-      "file": "source-html/chapter-30.html",
+      "file": "source-html/chapter-31.html",
       "status": "ready",
       "discussionId": "chapter-26"
     },
     {
-      "number": 31,
+      "number": 32,
       "title": "快速使用 Claude Code",
       "partIndex": 6,
-      "file": "source-html/chapter-31.html",
+      "file": "source-html/chapter-32.html",
       "status": "ready",
       "discussionId": "chapter-27"
     },
     {
-      "number": 32,
+      "number": 33,
       "title": "快速使用 PI",
       "partIndex": 6,
-      "file": "source-html/chapter-32.html",
+      "file": "source-html/chapter-33.html",
       "status": "ready",
       "discussionId": "chapter-28"
     },
     {
-      "number": 33,
+      "number": 34,
       "title": "快速使用 DeepSeek Harness",
       "partIndex": 6,
-      "file": "source-html/chapter-33.html",
+      "file": "source-html/chapter-34.html",
       "status": "ready",
       "discussionId": "chapter-29"
     },
     {
-      "number": 34,
+      "number": 35,
       "title": "补充：Agent 框架知识",
       "partIndex": 6,
-      "file": "source-html/chapter-34.html",
+      "file": "source-html/chapter-35.html",
       "status": "ready",
       "discussionId": "chapter-30"
     },
     {
-      "number": 35,
+      "number": 36,
       "title": "产线巡检 Agent：用 Penguin Harness 快速开发与优化",
       "partIndex": 6,
-      "file": "source-html/chapter-35.html",
+      "file": "source-html/chapter-36.html",
       "status": "ready",
       "discussionId": "penguin-harness-line-inspection"
     },
     {
-      "number": 36,
+      "number": 37,
       "title": "补充：大模型基础知识",
       "partIndex": 7,
-      "file": "source-html/chapter-36.html",
+      "file": "source-html/chapter-37.html",
       "status": "ready",
       "discussionId": "chapter-31"
     },
     {
-      "number": 37,
+      "number": 38,
       "title": "主流 LLM 评测",
       "partIndex": 7,
-      "file": "source-html/chapter-37.html",
+      "file": "source-html/chapter-38.html",
       "status": "ready",
       "discussionId": "chapter-34"
     }

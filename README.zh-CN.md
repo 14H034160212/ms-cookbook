@@ -34,7 +34,7 @@
 
 项目希望帮助读者建立**从任务定义到效果验证的实践能力**：先跑通一个结果，再理解运行条件与方法边界，逐步构建能够复现、评测和改进的应用。书中案例覆盖企业知识问答、语音助手、客服质检、AI 健身教练、商品营销图和产线巡检等场景。
 
-> **8 篇主题 · 37 个章节 · 36 章可读**
+> **8 篇主题 · 38 个章节 · 37 章可读**
 
 ## 开始阅读
 
@@ -60,8 +60,8 @@ python3 -m http.server 4173 --bind 127.0.0.1
 | --- | --- | --- |
 | **从零开始** | [01](content/chapters/chapter-01.md) → [05](content/chapters/chapter-05.md) → [07](content/chapters/chapter-07.md) | 理解模型、定义任务，完成第一次推理 |
 | **深入模型** | [13](content/chapters/chapter-13.md) → [14](content/chapters/chapter-14.md) → [16](content/chapters/chapter-16.md) | 准备训练数据、开展轻量微调，用评测检验效果 |
-| **走向应用** | [20](content/chapters/chapter-20.md) → [29](content/chapters/chapter-29.md) → [30](content/chapters/chapter-30.md) | 连接知识库、外部工具与可复用 Skill |
-| **AIGC 创作** | [23](content/chapters/chapter-23.md) → [24](content/chapters/chapter-24.md) → [25](content/chapters/chapter-25.md) → [27](content/chapters/chapter-27.md) | 从案例出发，学习图像 LoRA、商品图创作与理论基础 |
+| **走向应用** | [20](content/chapters/chapter-20.md) → [30](content/chapters/chapter-30.md) → [31](content/chapters/chapter-31.md) | 连接知识库、外部工具与可复用 Skill |
+| **AIGC 创作** | [23](content/chapters/chapter-23.md) → [24](content/chapters/chapter-24.md) → [25](content/chapters/chapter-25.md) → [26](content/chapters/chapter-26.md) → [28](content/chapters/chapter-28.md) | 从案例出发，学习图像 LoRA、商品图创作与理论基础 |
 
 ### 适合谁学？怎么学？
 
@@ -108,20 +108,21 @@ python3 -m http.server 4173 --bind 127.0.0.1
 | [23 · 10 个 Case，带你看看 AIGC 的开源模型能做到什么地步](content/chapters/chapter-23.md) | 开源生成模型的应用案例 |
 | [24 · 定制？使用 DiffSynth 训练图像 LoRA](content/chapters/chapter-24.md) | 使用 DiffSynth 定制图像 LoRA |
 | [25 · 一张商品营销图，从生成到修改怎么做？](content/chapters/chapter-25.md) | 商品图生成与编辑 |
-| [26 · 开源模型也能做出像样的 AI 视频吗？](content/chapters/chapter-26.md) | MiniMax H3 部署教程待更新 |
-| [27 · 补充：AIGC 理论知识](content/chapters/chapter-27.md) | 图像与视频生成基础 |
+| [26 · 想要教学海报？要不试试让 AI 帮忙画一张](content/chapters/chapter-26.md) | Qwen-Image 本地部署与 ModelScope 教学海报生成 |
+| [27 · 开源模型也能做出像样的 AI 视频吗？](content/chapters/chapter-27.md) | MiniMax H3 部署教程待更新 |
+| [28 · 补充：AIGC 理论知识](content/chapters/chapter-28.md) | 图像与视频生成基础 |
 | **第七篇　Agent 特别篇** | |
-| [28 · Agent 是什么，它能做什么事？](content/chapters/chapter-28.md) | Agent 的组成、执行流程与适用场景 |
-| [29 · MCP：让模型连接外部工具](content/chapters/chapter-29.md) | 连接模型与外部工具 |
-| [30 · Skill：把任务方法封装成能力](content/chapters/chapter-30.md) | 组织可复用的任务方法 |
-| [31 · 快速使用 Claude Code](content/chapters/chapter-31.md) | Claude Code 入门 |
-| [32 · 快速使用 PI](content/chapters/chapter-32.md) | PI 入门 |
-| [33 · 快速使用 DeepSeek Harness](content/chapters/chapter-33.md) | DeepSeek Harness 入门 |
-| [34 · 补充：Agent 框架知识](content/chapters/chapter-34.md) | Agent 框架基础 |
-| [35 · 产线巡检 Agent：用 Penguin Harness 快速开发与优化](content/chapters/chapter-35.md) | 用 Penguin Harness 开发产线巡检 Agent，并通过评测优化 |
+| [29 · Agent 是什么，它能做什么事？](content/chapters/chapter-29.md) | Agent 的组成、执行流程与适用场景 |
+| [30 · MCP：让模型连接外部工具](content/chapters/chapter-30.md) | 连接模型与外部工具 |
+| [31 · Skill：把任务方法封装成能力](content/chapters/chapter-31.md) | 组织可复用的任务方法 |
+| [32 · 快速使用 Claude Code](content/chapters/chapter-32.md) | Claude Code 入门 |
+| [33 · 快速使用 PI](content/chapters/chapter-33.md) | PI 入门 |
+| [34 · 快速使用 DeepSeek Harness](content/chapters/chapter-34.md) | DeepSeek Harness 入门 |
+| [35 · 补充：Agent 框架知识](content/chapters/chapter-35.md) | Agent 框架基础 |
+| [36 · 产线巡检 Agent：用 Penguin Harness 快速开发与优化](content/chapters/chapter-36.md) | 用 Penguin Harness 开发产线巡检 Agent，并通过评测优化 |
 | **第八篇 补充内容** | |
-| [36 · 补充：大模型基础知识](content/chapters/chapter-36.md) | 模型结构、训练、推理与局限 |
-| [37 · 主流 LLM 评测](content/chapters/chapter-37.md) | 主流模型评测的共建邀请 |
+| [37 · 补充：大模型基础知识](content/chapters/chapter-37.md) | 模型结构、训练、推理与局限 |
+| [38 · 主流 LLM 评测](content/chapters/chapter-38.md) | 主流模型评测的共建邀请 |
 
 ## 场景实践
 
@@ -132,7 +133,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 | 语音助手 | 串联语音识别、模型问答与语音合成 | [19](content/chapters/chapter-19.md) |
 | 企业知识问答 | 检索知识库，为回答提供参考依据 | [20](content/chapters/chapter-20.md) |
 | 商品营销图 | 完成商品图像生成与编辑 | [25](content/chapters/chapter-25.md) |
-| 产线巡检 | 用 Penguin Harness 开发产线巡检 Agent，并通过评测优化 | [35](content/chapters/chapter-35.md) |
+| 产线巡检 | 用 Penguin Harness 开发产线巡检 Agent，并通过评测优化 | [36](content/chapters/chapter-36.md) |
 
 ## 读者社区
 

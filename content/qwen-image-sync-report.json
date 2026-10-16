@@ -1,0 +1,364 @@
+{
+  "syncedAt": "2026-10-16",
+  "sourceUrl": "https://my.feishu.cn/wiki/Ue2awfFOrifJTZkzQkXcXxc1ngh",
+  "documentRevision": 128,
+  "sourceXmlSha256": "bbae4e29a2eeec72ed9d2ae8ec95f99b70197eac9c60de464042984f5bf7c128",
+  "sourceMarkdownSha256": "72300901782dba3204f619220ee3438d3633ed9a0f5a364767ee5d91507730d6",
+  "method": "Import the complete current Feishu chapter; preserve author credit, prose, heading order, code, table and media without editorial rewriting.",
+  "chapter": {
+    "number": 26,
+    "title": "想要教学海报？要不试试让 AI 帮忙画一张",
+    "partIndex": 5,
+    "file": "source-html/chapter-26.html",
+    "status": "ready",
+    "discussionId": "qwen-image-21-teaching-poster"
+  },
+  "chapterFileSha256": "d7656131ffd24e901dbc26c355ff2c4a5f2881f2aad83fd74d3296a4b8d14b01",
+  "proseVerified": true,
+  "headingOrderVerified": true,
+  "codeVerified": true,
+  "codeBlocks": 33,
+  "images": [
+    {
+      "file": "assets/qwen-image-20261016/model-index-file.jpg",
+      "originalName": "ByW2wmQQ.jpg",
+      "bytes": 95120,
+      "sha256": "cca6f791be541479af422ce6bb2be5242816f3303a552e9b9976a3bc61aa2961",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/transformer-folder.jpg",
+      "originalName": "3zMiCBbh.jpg",
+      "bytes": 85386,
+      "sha256": "f58c977c4f2da7e6d50b07a3279cb2385f324fb97741f2f85a5626ab0513da7f",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/transformer-config-file.jpg",
+      "originalName": "2YIPPnui.jpg",
+      "bytes": 63914,
+      "sha256": "957ecf3847e808322eb6570f5e533510a35df96700a6e4aa756bd71c69852638",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/call-decorator.jpg",
+      "originalName": "mrtgv3ti.jpg",
+      "bytes": 18169,
+      "sha256": "31f262c295860cd4c530abf090210c6ff32ae99809662a8138458704d37fc8bf",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/pipeline-source.jpg",
+      "originalName": "hBcgCqx8.jpg",
+      "bytes": 101531,
+      "sha256": "c23dfd2261e6297d05671a6456d79b4423c56a8bff3c8b574f1f65f5fee74cd1",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/iron-displacement-result.jpg",
+      "originalName": "rZpksEID.jpg",
+      "bytes": 520682,
+      "sha256": "f4b3f83ce88a00fc7f2251c2a9a6a1ed6827f36050b8fcb15aa7b4146ba95cd9",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/01-model-page.jpg",
+      "originalName": "01-model-page.jpg",
+      "bytes": 88634,
+      "sha256": "8a9c2ceb453c044a795b3c4d31eca95c2187263e34ab69f734473da453f4a6b3",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/02-online-experience.jpg",
+      "originalName": "02-online-experience.jpg",
+      "bytes": 62611,
+      "sha256": "e49a290e16ca6333e28ad5c6a3475fba7c9f797322574ac2bd74746c99e6bf9e",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/03a-prompt-entry.jpg",
+      "originalName": "03a-prompt-entry.jpg",
+      "bytes": 91546,
+      "sha256": "95de52cab58c8df7061d52aafe377c44aecd783fd9fdb0d0d9abdb78298bd744",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/03-prompt-and-settings.jpg",
+      "originalName": "03-prompt-and-settings.jpg",
+      "bytes": 56290,
+      "sha256": "2d1d89e99d23be717b626ece35c35f1016c8a2ae0f48802af452a486a647b18c",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/04a-generation-option.jpg",
+      "originalName": "04a-generation-option.jpg",
+      "bytes": 72649,
+      "sha256": "8b678c7b26837406a75322679e826cb84fac99661d84312222c3162afbf20cf0",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/11-final-result.jpg",
+      "originalName": "11-final-result.jpg",
+      "bytes": 76470,
+      "sha256": "623a668ec41f19707c3e0e1f096c99b15c5ff5f7f18dbb5f59a77791a2d6ce93",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/13-download-result.jpg",
+      "originalName": "13-download-result.jpg",
+      "bytes": 88140,
+      "sha256": "b88e54d7773de3940be24e8f34a908a33a9d5ddd19e1a38359ce492d73fa1798",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/01-carbon-dioxide.png",
+      "originalName": "01-carbon-dioxide.png",
+      "bytes": 1382732,
+      "sha256": "eaa33868f1458e22bb752e6c837251d980c1acef682a417a7622724b52194b7a",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/02-neutralisation.png",
+      "originalName": "02-neutralisation.png",
+      "bytes": 1494977,
+      "sha256": "0ca362f802eb1f4e57aaf541a34bb09b2224054184b7c3c1417851a4b58cc068",
+      "modified": false
+    },
+    {
+      "file": "assets/qwen-image-20261016/03-copper-hydroxide.png",
+      "originalName": "03-copper-hydroxide.png",
+      "bytes": 1582762,
+      "sha256": "f1f4402a61c3cbfee852c3d52ef280355cc49840a8588f79391c0e29e8d6f2ec",
+      "modified": false
+    }
+  ],
+  "sourceNotes": [
+    "The source retains the editorial marker 补充相关介绍.",
+    "Several source Python snippets have concatenated lines; retained verbatim for author review.",
+    "The source resolution explanation includes missing inline expressions; retained verbatim."
+  ],
+  "previousChapterNumbers": [
+    {
+      "previous": 1,
+      "current": 1,
+      "title": "开源模型正在改变什么",
+      "discussionId": "chapter-1"
+    },
+    {
+      "previous": 2,
+      "current": 2,
+      "title": "开源模型还没用上，先卡在下载这一步？",
+      "discussionId": "chapter-2"
+    },
+    {
+      "previous": 3,
+      "current": 3,
+      "title": "数据，是你要做开源模型微调的基石",
+      "discussionId": "chapter-3"
+    },
+    {
+      "previous": 4,
+      "current": 4,
+      "title": "没有资源也能玩开源模型，因为这里资源免费",
+      "discussionId": "chapter-4"
+    },
+    {
+      "previous": 5,
+      "current": 5,
+      "title": "要把业务问题转换成模型任务问题",
+      "discussionId": "chapter-5"
+    },
+    {
+      "previous": 6,
+      "current": 6,
+      "title": "先评再选：用 EvalScope 形成开源模型的第一份报告",
+      "discussionId": "chapter-6"
+    },
+    {
+      "previous": 7,
+      "current": 7,
+      "title": "30 分钟带你快速看到第一个结果",
+      "discussionId": "chapter-7"
+    },
+    {
+      "previous": 8,
+      "current": 8,
+      "title": "多大模型，选择什么样的服务器配置",
+      "discussionId": "chapter-8"
+    },
+    {
+      "previous": 9,
+      "current": 9,
+      "title": "笔记本也能跑开源模型，先从 Ollama 开始",
+      "discussionId": "chapter-9"
+    },
+    {
+      "previous": 10,
+      "current": 10,
+      "title": "把模型放到云端跑，用 Notebook 试试 CPU 和 GPU",
+      "discussionId": "chapter-10"
+    },
+    {
+      "previous": 11,
+      "current": 11,
+      "title": "把自己微调的 MiniCPM 装进手机：从训练拆解到魔搭实践",
+      "discussionId": "chapter-minicpm-todo"
+    },
+    {
+      "previous": 12,
+      "current": 12,
+      "title": "模型需要资源太多，量化能帮上什么忙？",
+      "discussionId": "chapter-11"
+    },
+    {
+      "previous": 13,
+      "current": 13,
+      "title": "业务素材这么多，怎么变成能训练的数据？",
+      "discussionId": "chapter-12"
+    },
+    {
+      "previous": 14,
+      "current": 14,
+      "title": "快速用 ms-swift，完成开源模型的轻量微调",
+      "discussionId": "chapter-13"
+    },
+    {
+      "previous": 15,
+      "current": 15,
+      "title": "模型已经会回答了，为什么还要做偏好对齐？",
+      "discussionId": "chapter-14"
+    },
+    {
+      "previous": 16,
+      "current": 16,
+      "title": "微调有没有用，测才知道？",
+      "discussionId": "chapter-15"
+    },
+    {
+      "previous": 17,
+      "current": 17,
+      "title": "AI 健身教练：跟着视频练，让 AI 指出动作不标准的地方",
+      "discussionId": "chapter-16"
+    },
+    {
+      "previous": 18,
+      "current": 18,
+      "title": "智能客服质检：AI 能从一通客服电话中分析出什么？",
+      "discussionId": "chapter-17"
+    },
+    {
+      "previous": 19,
+      "current": 19,
+      "title": "搭建一个能听也能说的语音助手",
+      "discussionId": "chapter-18"
+    },
+    {
+      "previous": 20,
+      "current": 20,
+      "title": "实现一个企业知识问答助手",
+      "discussionId": "chapter-19"
+    },
+    {
+      "previous": 21,
+      "current": 21,
+      "title": "用 MiniCPM-V 搭建手机巡检助手：拍照生成现场记录",
+      "discussionId": "chapter-minicpm-inspection"
+    },
+    {
+      "previous": 22,
+      "current": 22,
+      "title": "场景有千千万，欢迎你来共建出你的场景",
+      "discussionId": "chapter-32"
+    },
+    {
+      "previous": 23,
+      "current": 23,
+      "title": "10 个 Case，带你看看 AIGC 的开源模型能做到什么地步",
+      "discussionId": "chapter-20"
+    },
+    {
+      "previous": 24,
+      "current": 24,
+      "title": "定制？使用 DiffSynth 训练图像 LoRA",
+      "discussionId": "chapter-21"
+    },
+    {
+      "previous": 25,
+      "current": 25,
+      "title": "一张商品营销图，从生成到修改怎么做？",
+      "discussionId": "chapter-22"
+    },
+    {
+      "previous": 26,
+      "current": 27,
+      "title": "开源模型也能做出像样的 AI 视频吗？",
+      "discussionId": "chapter-23"
+    },
+    {
+      "previous": 27,
+      "current": 28,
+      "title": "补充：AIGC 理论知识",
+      "discussionId": "chapter-24"
+    },
+    {
+      "previous": 28,
+      "current": 29,
+      "title": "Agent 是什么，它能做什么事？",
+      "discussionId": "chapter-33"
+    },
+    {
+      "previous": 29,
+      "current": 30,
+      "title": "MCP：让模型连接外部工具",
+      "discussionId": "chapter-25"
+    },
+    {
+      "previous": 30,
+      "current": 31,
+      "title": "Skill：把任务方法封装成能力",
+      "discussionId": "chapter-26"
+    },
+    {
+      "previous": 31,
+      "current": 32,
+      "title": "快速使用 Claude Code",
+      "discussionId": "chapter-27"
+    },
+    {
+      "previous": 32,
+      "current": 33,
+      "title": "快速使用 PI",
+      "discussionId": "chapter-28"
+    },
+    {
+      "previous": 33,
+      "current": 34,
+      "title": "快速使用 DeepSeek Harness",
+      "discussionId": "chapter-29"
+    },
+    {
+      "previous": 34,
+      "current": 35,
+      "title": "补充：Agent 框架知识",
+      "discussionId": "chapter-30"
+    },
+    {
+      "previous": 35,
+      "current": 36,
+      "title": "产线巡检 Agent：用 Penguin Harness 快速开发与优化",
+      "discussionId": "penguin-harness-line-inspection"
+    },
+    {
+      "previous": 36,
+      "current": 37,
+      "title": "补充：大模型基础知识",
+      "discussionId": "chapter-31"
+    },
+    {
+      "previous": 37,
+      "current": 38,
+      "title": "主流 LLM 评测",
+      "discussionId": "chapter-34"
+    }
+  ]
+}
