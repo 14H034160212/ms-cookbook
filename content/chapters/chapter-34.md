@@ -12,7 +12,7 @@
 
 本文用 Qwen3 系列开源模型和 vLLM，在魔搭 Notebook 中一步步搭建这个 Mini AI Scientist，并回答一个实际问题：<strong>多小的开源模型能完成这类"科学发现"？瓶颈在模型规模、思考模式，还是 Agent 的流程设计？</strong>
 
-<table><thead><tr><th><p>项目</p></th><th><p>内容</p></th></tr></thead><tbody><tr><td><p>一句话简介</p></td><td><p>给开源模型一台隐藏规则的黑盒机器，让它自己提出假设、设计实验、调用 Python 检验并修正，最终提交规则，由程序在 441 个输入上穷举验证对错。</p></td></tr><tr><td><p>适用对象</p></td><td><p>做 LLM Agent、推理与评测的开发者；想把 AI Scientist 落到可量化实验的同学；需要可验证奖励环境（如 GRPO）的训练者。</p></td></tr><tr><td><p>难度与耗时</p></td><td><p>进阶。首次复现约 60 分钟：安装依赖约 10 分钟，下载模型约 5 分钟，Notebook 运行约 35 分钟（单卡 A100 实测，24GB 显卡会更慢）。</p></td></tr><tr><td><p>运行方式</p></td><td><p>魔搭 Notebook（单卡 GPU，≥24GB 显存），本地 vLLM 推理，无需任何 API Key。</p></td></tr><tr><td><p>主要模型与工具</p></td><td><p>Qwen3-4B（思考模式，主模型）；Qwen3-0.6B/1.7B/8B 与 Qwen2.5-Instruct 用于对比；vLLM 0.11.0；Python AST 沙箱。</p></td></tr></tbody></table>
+<table><thead><tr><th><p>项目</p></th><th><p>内容</p></th></tr></thead><tbody><tr><td><p>一句话简介</p></td><td><p>给开源模型一台隐藏规则的黑盒机器，让它自己提出假设、设计实验、调用 Python 检验并修正，最终提交规则，由程序在 441 个输入上穷举验证对错。</p></td></tr><tr><td><p>适用对象</p></td><td><p>做 LLM Agent、推理与评测的开发者；想把 AI Scientist 落到可量化实验的同学；需要可验证奖励环境（如 GRPO）的训练者。</p></td></tr><tr><td><p>难度与耗时</p></td><td><p>进阶。魔搭 Notebook 的 GPU 环境上复现约 100 分钟（环境 4 分钟 + 下载模型 2 分钟 + 科研评测过程运行约 80–90 分钟）。</p></td></tr><tr><td><p>运行方式</p></td><td><p>魔搭 Notebook（单卡 GPU，≥24GB 显存），本地 vLLM 推理，无需任何 API Key。</p></td></tr><tr><td><p>主要模型与工具</p></td><td><p>Qwen3-4B（思考模式，主模型）；Qwen3-0.6B/1.7B/8B 与 Qwen2.5-Instruct 用于对比；vLLM 0.11.0；Python AST 沙箱。</p></td></tr></tbody></table>
 
 本 Case 的输入、输出与完成边界如下：
 
@@ -47,7 +47,7 @@
 在 Notebook 的第一个单元格中运行下面的命令。安装完成后，<strong>重启 Kernel</strong> 再继续：
 
 ```bash
-pip install -q "vllm==0.11.0" "transformers>=4.56,<5" modelscope pandas matplotlib
+pip install -q "vllm==0.11.0" "transformers>=4.56,<5"
 ```
 
 <strong>第 2 步：获取代码</strong>
@@ -55,8 +55,8 @@ pip install -q "vllm==0.11.0" "transformers>=4.56,<5" modelscope pandas matplotl
 本文的完整代码、Notebook 和实测结果都在 [mini-ai-scientist 仓库](<https://github.com/14H034160212/mini-ai-scientist>)中：
 
 ```bash
-git clone https://github.com/14H034160212/mini-ai-scientist.git mini_ai_scientist
-cd mini_ai_scientist
+git clone https://github.com/14H034160212/mini-ai-scientist.git mini-ai-scientist
+cd mini-ai-scientist
 python scripts/test_lab.py      # 无需 GPU 的自检，应输出 all lab tests passed
 ```
 
@@ -316,6 +316,7 @@ python scripts/analyze.py results/sweep    # 生成 summary.md 与 solve_rate.pn
 
 ## 8\. 代码、数据与参考资料
 
+- 在灵感流打开：[https://modelscope.cn/gallery/ms-cookbook-team/mini-ai-scientist](<https://modelscope.cn/gallery/ms-cookbook-team/mini-ai-scientist>)
 - 代码仓库：[mini-ai-scientist](<https://github.com/14H034160212/mini-ai-scientist>)，包含 `mini_scientist/` 源码、`scripts/`、带真实输出的 Notebook，以及 `results/sweep/` 下 17 个配置的完整逐轮记录。
 - 数据：无外部数据。12 条规则定义在 `mini_scientist/lab.py` 中，开局观测由随机种子生成。
 - 模型（Apache-2.0）：[Qwen3-4B](<https://modelscope.cn/models/Qwen/Qwen3-4B>)、[Qwen3-8B](<https://modelscope.cn/models/Qwen/Qwen3-8B>)、[Qwen3-1.7B](<https://modelscope.cn/models/Qwen/Qwen3-1.7B>)、[Qwen3-0.6B](<https://modelscope.cn/models/Qwen/Qwen3-0.6B>)。
